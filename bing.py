@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
+# Download recent images from the Bing archive.
+# Through trial and error, it has been determined that
+# no more than 15 recent images are available for download.
+#
+# The XML and RSS responses provide links to 1366x768 images.
+# The JSON response provides links to 1920x1080 images.
+#
 # Copyright 2017 Thomas M. Parks <tmparks@yahoo.com>
-# Download recent Bing images.
 
 import json, posixpath, urllib.parse, urllib.request
 
@@ -15,5 +21,5 @@ for url in request_urls:
        for image in obj['images']:
            image_url = urllib.parse.urljoin(url, image['url'])
            local_file = posixpath.basename(image_url)
-           urllib.request.urlretrieve(image_url, local_file)
            print(local_file)
+           urllib.request.urlretrieve(image_url, local_file)
