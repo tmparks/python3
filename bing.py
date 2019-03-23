@@ -6,7 +6,7 @@
 # The XML and RSS responses provide links to 1366x768 images.
 # The JSON response provides links to 1920x1080 images.
 #
-# Copyright 2017 Thomas M. Parks <tmparks@yahoo.com>
+# Copyright 2017-2019 Thomas M. Parks <tmparks@yahoo.com>
 
 import json, posixpath, urllib.parse, urllib.request
 
@@ -20,6 +20,7 @@ for url in request_urls:
        obj = json.load(response)
        for image in obj['images']:
            image_url = urllib.parse.urljoin(url, image['url'])
-           local_file = posixpath.basename(image_url)
+           qs = urllib.parse.urlparse(image['url']).query
+           local_file = ''.join(urllib.parse.parse_qs(qs)['id'])
            print(local_file)
            urllib.request.urlretrieve(image_url, local_file)
