@@ -9,7 +9,7 @@
 # Copyright 2017-2021 Thomas M. Parks <tmparks@yahoo.com>
 # Additional contributors: Benjamin Parks
 
-import glob, json, os, PIL.Image, posixpath, sys, tempfile, urllib.parse, urllib.request
+import json, os, PIL.Image, sys, tempfile, urllib.parse, urllib.request
 
 # The screen dimensions for the 2021 16-inch MacBook Pro are 3456x2234.
 # The screen area below the menu bar is 3456x2160, so that the height of the
