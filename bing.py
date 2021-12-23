@@ -9,7 +9,7 @@
 # Copyright 2017-2021 Thomas M. Parks <tmparks@yahoo.com>
 # Additional contributors: Benjamin Parks
 
-import glob, json, os, PIL.Image, posixpath, sys, urllib.parse, urllib.request
+import glob, json, os, PIL.Image, posixpath, sys, tempfile, urllib.parse, urllib.request
 
 # The screen dimensions for the 2021 16-inch MacBook Pro are 3456x2234.
 # The screen area below the menu bar is 3456x2160, so that the height of the
@@ -26,15 +26,19 @@ request_urls = [
     'https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=7&mkt=en-US',
     'https://www.bing.com/HPImageArchive.aspx?format=js&idx=7&n=8&mkt=en-US'
     ]
-    
+
 for url in request_urls:
     with urllib.request.urlopen(url) as response:
         obj = json.load(response)
         for image in obj['images']:
             image_url = urllib.parse.urljoin(url, image['url'])
             qs = urllib.parse.urlparse(image['url']).query
-            local_file = ''.join(urllib.parse.parse_qs(qs)['id'])
-            local_file = os.path.join(here, local_file)
-            print(local_file)
-            urllib.request.urlretrieve(image_url, local_file)
-            add_menu_bar(local_file, local_file)
+            id = ''.join(urllib.parse.parse_qs(qs)['id'])
+            (root, ext) = os.path.splitext(id)
+            local_file = os.path.join(here, root + '.png')
+            if not os.path.exists(local_file):
+                print(local_file)
+                temp_file = tempfile.mktemp(suffix=ext)
+                urllib.request.urlretrieve(image_url, temp_file)
+                add_menu_bar(temp_file, local_file)
+                os.remove(temp_file)
