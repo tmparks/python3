@@ -6,18 +6,29 @@
 # The XML and RSS responses provide links to 1366x768 images.
 # The JSON response provides links to 1920x1080 images.
 #
-# Copyright 2017-2021 Thomas M. Parks <tmparks@yahoo.com>
+# Copyright 2017-2022 Thomas M. Parks <tmparks@yahoo.com>
 # Additional contributors: Benjamin Parks
 
 import json, os, PIL.Image, sys, tempfile, urllib.parse, urllib.request
 
-# The screen dimensions for the 2021 16-inch MacBook Pro are 3456x2234.
-# The screen area below the menu bar is 3456x2160, so that the height of the
-# menu bar is 74 pixels. Thus we add 37 pixels to the top of a 1920x1080 image.
-def add_menu_bar(in_file, out_file, height=37):
+# The dimensions of the 16-inch screen for the 2021 MacBook Pro are 3456x2234.
+# The dimensions of the 14-inch screen are 3024x1964. The area below the menu
+# bar has an aspect ratio of 16:10. That area is 3456x2160 for the 16-inch
+# screen and 3024x1890 for the 14-inch screen. The height of the menu bar is
+# 74 pixels in both cases.
+def add_menu_bar(in_file, out_file, target=2160):
     input = PIL.Image.open(in_file)
-    output = PIL.Image.new(input.mode, (input.size[0], input.size[1] + height))
-    output.paste(input, (0, height, output.size[0], output.size[1]))
+    (width, height) = (input.size[0], input.size[1])
+    (left, upper, right, lower) = (0, 0, width, height)
+    ratio = 16 / 10
+    if width / height < ratio: # too tall
+        height = round(width / ratio)
+        upper = round((input.size[1] - height) / 2)
+        lower = upper + height
+    offset = round(74 * height / target)
+    cropped = input.crop((left, upper, right, lower))
+    output = PIL.Image.new(input.mode, (width, height + offset))
+    output.paste(cropped, (0, offset, output.size[0], output.size[1]))
     output.save(out_file)
 
 here = os.path.dirname(sys.argv[0])
