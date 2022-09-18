@@ -17,19 +17,19 @@ import json, os, PIL.Image, sys, tempfile, urllib.parse, urllib.request
 # screen and 3024x1890 for the 14-inch screen. The height of the menu bar is
 # 74 pixels in both cases.
 def add_menu_bar(in_file, out_file, target=2160):
-    input = PIL.Image.open(in_file)
-    (width, height) = (input.size[0], input.size[1])
-    (left, upper, right, lower) = (0, 0, width, height)
-    ratio = 16 / 10
-    if width / height < ratio: # too tall
-        height = round(width / ratio)
-        upper = round((input.size[1] - height) / 2)
-        lower = upper + height
-    offset = round(74 * height / target)
-    cropped = input.crop((left, upper, right, lower))
-    output = PIL.Image.new(input.mode, (width, height + offset))
-    output.paste(cropped, (0, offset, output.size[0], output.size[1]))
-    output.save(out_file)
+    with PIL.Image.open(in_file) as input:
+        (width, height) = (input.size[0], input.size[1])
+        (left, upper, right, lower) = (0, 0, width, height)
+        ratio = 16 / 10
+        if width / height < ratio: # too tall
+            height = round(width / ratio)
+            upper = round((input.size[1] - height) / 2)
+            lower = upper + height
+        offset = round(74 * height / target)
+        cropped = input.crop((left, upper, right, lower))
+        output = PIL.Image.new(input.mode, (width, height + offset))
+        output.paste(cropped, (0, offset, output.size[0], output.size[1]))
+        output.save(out_file)
 
 here = os.path.dirname(sys.argv[0])
 
@@ -42,11 +42,11 @@ for url in request_urls:
     with urllib.request.urlopen(url) as response:
         obj = json.load(response)
         for image in obj['images']:
-            image_url = urllib.parse.urljoin(url, image['url'])
-            qs = urllib.parse.urlparse(image['url']).query
+            image_url = urllib.parse.urljoin(url, image['urlbase']) + '_UHD.jpg&h=2160'
+            qs = urllib.parse.urlparse(image_url).query
             id = ''.join(urllib.parse.parse_qs(qs)['id'])
             (root, ext) = os.path.splitext(id)
-            local_file = os.path.join(here, root + '.png')
+            local_file = os.path.join(here, root + '.jpg')
             if not os.path.exists(local_file):
                 print(local_file)
                 temp_file = tempfile.mktemp(suffix=ext)
