@@ -14,7 +14,7 @@ import json, os, PIL.Image, sys, tempfile, urllib.parse, urllib.request
 # The dimensions of the 16-inch screen for the 2021 MacBook Pro are 3456x2234.
 # The dimensions of the 14-inch screen are 3024x1964. The area below the menu
 # bar has an aspect ratio of approximately 16:10. Through trial and error, it
-# has been determined that the height of the menu bar is 68 pixels for the
+# has been determined that the height of the menu bar is 65 pixels for the
 # 16-inch screen.
 def add_menu_bar(in_file, out_file, target=2160):
     with PIL.Image.open(in_file) as input:
@@ -25,7 +25,7 @@ def add_menu_bar(in_file, out_file, target=2160):
             height = round(width / ratio)
             upper = round((input.size[1] - height) / 2)
             lower = upper + height
-        offset = round(68 * height / target)
+        offset = round(65 * height / target)
         cropped = input.crop((left, upper, right, lower))
         output = PIL.Image.new(input.mode, (width, height + offset))
         output.paste(cropped, (0, offset, output.size[0], output.size[1]))
